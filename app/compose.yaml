@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  client:
+    build: 
+      context: ./client       
+    ports:
+      - "3000:80"             
+    depends_on:
+      - server                
+  server:
+    build: 
+      context: ./server     
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1  
+    ports:
+      - "8000:8000"          
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017
+      - CHROMA_URL=http://chromadb:8000
+    depends_on:
+      - mongodb
+      - chromadb
+
+  mongodb:
+    image: mongo:latest       
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db   
+
+  chromadb:
+    image: chromadb/chroma:latest
+    ports:
+      - "8001:8000"           
+    volumes:
+      - chroma_data:/chroma/chroma
+
+volumes:
+  mongo_data:
+  chroma_data:
